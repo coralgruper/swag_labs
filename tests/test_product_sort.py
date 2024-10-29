@@ -45,24 +45,24 @@ def test_default_sort(setup_driver):
         pytest.fail("Could not verify the default sort option or item order.")
 
 
-# Sort by Name (Z to A)
-def test_sort_name_Z_A(self):
+# Test to sort by Name (Z to A)
+def test_sort_name_Z_A(setup_driver):
     inventory_page = InventoryPage()
     inventory_page.driver = setup_driver  # Use the setup driver for the inventory page
 
     # Fetch inventory items and check if they are sorted by descending names
-    items_names = inventory_page.get_inventory_items_names().copy()
-    ascending_items_names = sorted(items_names)  # Sort items names from A to Z
-    descending_items_names = reversed(ascending_items_names)  # reverse items names (from Z to A)
+    inventory_page.select_sort_type_text("Name (Z to A)")
+    items_names = inventory_page.get_inventory_items_names()
+    sorted_items_names_desc = sorted(items_names, reverse=True)  # Sort items list in descending order for comparison
 
     try:
         # Verify descending name sort (Z to A)
-        selected_inventory_sort_text = inventory_page.select_sort_type_text("Name (Z to A)")
+        selected_inventory_sort_text = inventory_page.get_sort_type_text()
         expected_inventory_sort_text = "Name (Z to A)"
-        assert selected_inventory_sort_text == expected_inventory_sort_text, "Default order is not correct."
-        assert items_names == descending_items_names, "Items are not correctly ordered."
+        assert selected_inventory_sort_text == expected_inventory_sort_text, "Sort type text does not match."
+        assert items_names == sorted_items_names_desc, "Items are not correctly ordered by Name (Z to A)."
     except NoSuchElementException:
-        pytest.fail("Could not verify the default sort option or item order.")
+        pytest.fail("Could not verify the sort option or item order.")
 
 
 """
