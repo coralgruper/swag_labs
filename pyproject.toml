@@ -1,0 +1,4 @@
+[project]
+name = "swag_labs_tests"
+version = "2024.0.0"
+dependencies =["pytest",]
