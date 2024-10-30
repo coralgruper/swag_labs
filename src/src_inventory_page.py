@@ -1,4 +1,6 @@
 from src.swag_labs_functions import SwagLabsFunctions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
@@ -26,3 +28,24 @@ class InventoryPage(SwagLabsFunctions):
         sort_type = self.driver.find_element(By.CLASS_NAME, "product_sort_container")
         select = Select(sort_type)
         return select.first_selected_option.text
+
+    def reset_app_state(self):
+        menu_button = self.driver.find_element(By.ID, "react-burger-menu-btn")
+        menu_button.click()
+        reset_option = self.driver.find_element(By.ID, "reset_sidebar_link")
+        reset_option.click()
+
+    def logout(self):
+        # Open the menu
+        menu_button = self.driver.find_element(By.ID, "react-burger-menu-btn")
+        menu_button.click()
+
+        # Wait until the logout option is clickable, then click it
+        logout_option = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.ID, "logout_sidebar_link"))
+        )
+        logout_option.click()
+
+    def go_to_cart(self):
+        cart_button = self.driver.find_element(By.ID, "shopping_cart_container")
+        cart_button.click()
