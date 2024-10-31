@@ -29,12 +29,6 @@ class InventoryPage(SwagLabsFunctions):
         select = Select(sort_type)
         return select.first_selected_option.text
 
-    def reset_app_state(self):
-        menu_button = self.driver.find_element(By.ID, "react-burger-menu-btn")
-        menu_button.click()
-        reset_option = self.driver.find_element(By.ID, "reset_sidebar_link")
-        reset_option.click()
-
     def logout(self):
         # Open the menu
         menu_button = self.driver.find_element(By.ID, "react-burger-menu-btn")
@@ -49,3 +43,9 @@ class InventoryPage(SwagLabsFunctions):
     def go_to_cart(self):
         cart_button = self.driver.find_element(By.ID, "shopping_cart_container")
         cart_button.click()
+
+    def reset_app_state(self):
+        menu_button = self.driver.find_element(By.ID, "react-burger-menu-btn")
+        menu_button.click()
+        reset_option = self.driver.find_element(By.ID, "reset_sidebar_link")
+        reset_option.click()
