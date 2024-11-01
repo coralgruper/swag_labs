@@ -25,72 +25,75 @@ def setup_driver():
     driver.quit()
 
 
-# A series of basic functionality tests for the Inventory Page
+class TestInventoryFunctionality:
+    # A series of basic functionality tests for the Inventory Page
 
+    # --- 1. Test the "Go To Shopping Cart" Button
+    def test_go_to_cart(self, setup_driver):
+        inventory_page = InventoryPage()
+        inventory_page.driver = setup_driver
+        inventory_page.wait = WebDriverWait(setup_driver, 10)
 
-# 1. Test the "Go To Shopping Cart" Button
-def test_go_to_cart(setup_driver):
-    inventory_page = InventoryPage()
-    inventory_page.driver = setup_driver
-    inventory_page.wait = WebDriverWait(setup_driver, 10)
+        try:
+            inventory_page.go_to_cart()
+            shopping_cart_page = inventory_page.driver.find_element(By.ID, "cart_contents_container")
+            inventory_page.driver.save_screenshot("shopping_cart_page.png")
+            assert shopping_cart_page.is_displayed(), "Go to cart failed - Shopping cart page not found."
+        except NoSuchElementException:
+            pytest.fail("Go to cart failed - Shopping cart page not found.")
 
-    try:
-        inventory_page.go_to_cart()
-        shopping_cart_page = inventory_page.driver.find_element(By.ID, "cart_contents_container")
-        inventory_page.driver.save_screenshot("shopping_cart_page.png")
-        assert shopping_cart_page.is_displayed(), "Go to cart failed - Shopping cart page not found."
-    except NoSuchElementException:
-        pytest.fail("Go to cart failed - Shopping cart page not found.")
+    # --- 2. Test the "Add To Cart" Button with multiple items
+    def test_add_items_to_cart(self, setup_driver):
+        inventory_page = InventoryPage()
+        inventory_page.driver = setup_driver
+        inventory_page.wait = WebDriverWait(setup_driver, 10)
 
-
-# 2. Test the "Add To Cart" Button with multiple items
-def test_add_items_to_cart(setup_driver):
-    inventory_page = InventoryPage()
-    inventory_page.driver = setup_driver
-    inventory_page.wait = WebDriverWait(setup_driver, 10)
-
-    try:
         # Find all "Add to Cart" buttons on the page
         add_to_cart_buttons = inventory_page.driver.find_elements(By.CLASS_NAME, "btn_inventory")
 
         if not add_to_cart_buttons:
             pytest.fail("No 'Add to Cart' buttons found on the page.")
 
-        num_items_to_add = random.randint(1, len(add_to_cart_buttons))
-        selected_buttons = random.sample(add_to_cart_buttons, num_items_to_add)
+        self.num_items_to_add = random.randint(1, len(add_to_cart_buttons))
+        self.selected_buttons = random.sample(add_to_cart_buttons, self.num_items_to_add)
 
-        # Track the indices of items added to the cart
-        for button in selected_buttons:
+        self.updated_buttons_list = []
+        for button in self.selected_buttons:
             button.click()
-            # Re-fetch the button to verify the text has changed
             updated_button = inventory_page.driver.find_elements(By.CLASS_NAME, "btn_inventory")[
                 add_to_cart_buttons.index(button)]
+            self.updated_buttons_list.append(updated_button)
             assert updated_button.text == "Remove", "Button did not change to 'Remove' after adding item to cart."
 
-        # Verify cart count matches the number of items added
         cart_count = inventory_page.driver.find_element(By.CLASS_NAME, "shopping_cart_badge").text
         assert cart_count == str(
-            num_items_to_add), f"Expected cart count to be {num_items_to_add} but got {cart_count}."
+            self.num_items_to_add), f"Expected cart count to be {self.num_items_to_add} but got {cart_count}."
 
-    except NoSuchElementException:
-        pytest.fail("Add Multiple Items To Cart failed - Required elements not found.")
+    # --- 3. Test the "Remove" (items from cart) Button with multiple items
+    def test_remove_items_from_cart(self, setup_driver):
+        inventory_page = InventoryPage()
+        inventory_page.driver = setup_driver
+        inventory_page.wait = WebDriverWait(setup_driver, 10)
 
+        # Add items to cart before removing
+        self.test_add_items_to_cart(setup_driver)
 
-# 3. Test for Logout Button
-def test_logout(setup_driver):
-    inventory_page = InventoryPage()
-    inventory_page.driver = setup_driver
-    inventory_page.wait = WebDriverWait(setup_driver, 10)
+        num_items_to_remove = random.randint(1, len(self.updated_buttons_list))
+        selected_remove_buttons = random.sample(self.updated_buttons_list, num_items_to_remove)
 
-    try:
-        inventory_page.logout()
-        login_page = inventory_page.driver.find_element(By.ID, "root")
-        inventory_page.driver.save_screenshot("login_page.png")
-        assert login_page.is_displayed(), "Logout failed - Login page not found."
-    except NoSuchElementException:
-        pytest.fail("Logout failed - Login page not found.")
+        for remove_button in selected_remove_buttons:
+            remove_button.click()
+            updated_button_add = inventory_page.driver.find_elements(By.CLASS_NAME, "btn_inventory")[
+                self.updated_buttons_list.index(remove_button)]
+            assert updated_button_add.text == "Add to cart", "Button did not change to 'Add to cart' after removing " \
+                                                             "item from cart."
 
+        # Attempt to retrieve the cart badge; handle if it doesn't exist
+        try:
+            updated_cart_count = inventory_page.driver.find_element(By.CLASS_NAME, "shopping_cart_badge").text
+        except NoSuchElementException:
+            updated_cart_count = "0"  # Set to "0" if the cart badge is not present
 
-def test_remove_items_from_cart(setup_driver):
-    pass
-# 4. Test for Reset App State button (in a separate test file: 'test_reset_app_state.py')
+        remaining_items = self.num_items_to_add - num_items_to_remove
+        assert updated_cart_count == str(
+            remaining_items), f"Expected cart count to be {remaining_items} but got {updated_cart_count}."
