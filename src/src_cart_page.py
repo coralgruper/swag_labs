@@ -1,5 +1,6 @@
 from src.swag_labs_functions import SwagLabsFunctions
 from src.src_inventory_page import InventoryPage
+from src.src_login_page import LoginPage
 from selenium.webdriver.common.by import By
 
 

@@ -1,3 +1,4 @@
+import random
 from src.swag_labs_functions import SwagLabsFunctions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -38,14 +39,21 @@ class InventoryPage(SwagLabsFunctions):
         logout_option = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.ID, "logout_sidebar_link"))
         )
-        logout_option.click()
+        return logout_option.click()
 
     def go_to_cart(self):
         cart_button = self.driver.find_element(By.ID, "shopping_cart_container")
-        cart_button.click()
+        return cart_button.click()
 
     def reset_app_state(self):
         menu_button = self.driver.find_element(By.ID, "react-burger-menu-btn")
         menu_button.click()
         reset_option = self.driver.find_element(By.ID, "reset_sidebar_link")
-        reset_option.click()
+        return reset_option.click()
+
+    def add_random_items_to_cart(self):
+        add_to_cart_buttons = self.driver.find_elements(By.CLASS_NAME, "btn_inventory")
+        num_items_to_add = random.randint(1, len(add_to_cart_buttons))
+        selected_buttons = random.sample(add_to_cart_buttons, num_items_to_add)
+        for button in selected_buttons:
+            button.click()
