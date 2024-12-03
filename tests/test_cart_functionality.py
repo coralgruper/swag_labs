@@ -34,9 +34,11 @@ class TestCartFunctionality:
         inventory_page = InventoryPage()
         inventory_page.driver = setup_driver
         inventory_page.wait = WebDriverWait(setup_driver, 10)
+
         cart_page = ShoppingCartPage()
         cart_page.driver = setup_driver
         cart_page.wait = WebDriverWait(setup_driver, 10)
+
         try:
             inventory_page.go_to_cart()
             cart_page.cart_continue_shopping()
@@ -50,6 +52,7 @@ class TestCartFunctionality:
         inventory_page = InventoryPage()
         inventory_page.driver = setup_driver
         inventory_page.wait = WebDriverWait(setup_driver, 10)
+
         cart_page = ShoppingCartPage()
         cart_page.driver = setup_driver
         cart_page.wait = WebDriverWait(setup_driver, 10)
@@ -67,6 +70,7 @@ class TestCartFunctionality:
         inventory_page = InventoryPage()
         inventory_page.driver = setup_driver
         inventory_page.wait = WebDriverWait(setup_driver, 10)
+
         cart_page = ShoppingCartPage()
         cart_page.driver = setup_driver
         cart_page.wait = WebDriverWait(setup_driver, 10)
